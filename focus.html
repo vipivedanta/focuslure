@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sunrise Focus</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg1:#fff4e0;--bg2:#ffd9c0;--card:rgba(255,255,255,.65);--ink:#3d2a2a;--soft:#8a6a5e;--accent:#ff7a59;--accent2:#ffb347;--glass:#7a5a4a;--sand:#ffb347}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#2b1f3a;--bg2:#4a2c4a;--card:rgba(255,255,255,.08);--ink:#fff1e6;--soft:#d1b5c0;--glass:#e8c9b8}}
+:root[data-theme="dark"]{--bg1:#2b1f3a;--bg2:#4a2c4a;--card:rgba(255,255,255,.08);--ink:#fff1e6;--soft:#d1b5c0;--glass:#e8c9b8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2));background-attachment:fixed}
+main{max-width:920px;margin:0 auto;padding:20px 16px 40px;display:grid;gap:18px}
+h1{margin:0;font-size:1.3rem;text-align:center;letter-spacing:.5px}
+#msg{text-align:center;color:var(--soft);margin:-8px 0 0;min-height:1.4em}
+.card{background:var(--card);backdrop-filter:blur(8px);border-radius:28px;padding:20px;box-shadow:0 10px 30px rgba(255,122,89,.15)}
+.hero{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+@media(max-width:640px){.hero{grid-template-columns:1fr}}
+.clockwrap{text-align:center}
+#time{font-size:clamp(4.5rem,17vw,9.5rem);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+.chip{border:2px solid transparent;background:var(--card);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.chip.on{border-color:var(--accent);background:rgba(255,122,89,.18)}
+.btns{display:flex;gap:12px;justify-content:center}
+.go{border:0;border-radius:999px;padding:16px 46px;font:inherit;font-size:1.3rem;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--accent),var(--accent2));cursor:pointer;box-shadow:0 8px 20px rgba(255,122,89,.4)}
+.go:active{transform:scale(.97)}
+.ghost{border:2px solid var(--accent);background:transparent;color:var(--ink);border-radius:999px;padding:14px 22px;font:inherit;font-weight:700;cursor:pointer}
+#glass{width:200px;height:300px;display:block;margin:auto}
+@media(max-width:640px){#glass{width:150px;height:225px}}
+h2{margin:0 0 12px;font-size:1.05rem}
+.music{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.m{border:2px solid transparent;background:var(--card);color:var(--ink);border-radius:20px;padding:12px 8px;font:inherit;cursor:pointer;text-align:center}
+.m b{display:block;font-size:1.6rem}
+.m.on{border-color:var(--accent);background:rgba(255,122,89,.18)}
+.vol{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--soft)}
+.vol input{flex:1;accent-color:var(--accent)}
+.stats{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.stat b{font-size:1.8rem;display:block}
+.stat span{color:var(--soft);font-size:.85rem}
+.bar{height:10px;border-radius:9px;background:rgba(255,122,89,.18);overflow:hidden;margin:14px 0 10px}
+#fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s}
+#mini{display:flex;flex-wrap:wrap;gap:6px;min-height:34px}
+#mini svg{width:24px;height:34px}
+.sand{transition:y .9s linear,height .9s linear}
+</style></head><body>
+<main>
+<h1>☀️ Sunrise Focus</h1>
+<p id="msg">One calm block at a time.</p>
+
+<section class="card hero">
+ <div class="clockwrap">
+  <div id="time">30:00</div>
+  <div class="chips" id="durs"></div>
+  <div class="btns"><button class="go" id="start">Start</button><button class="ghost" id="reset">Reset</button></div>
+ </div>
+ <svg id="glass" viewBox="0 0 200 300" aria-label="Session hourglass">
+  <defs><clipPath id="cl"><path d="M40 20H160C160 80 110 130 104 150H96C90 130 40 80 40 20Z"/><path d="M96 150H104C110 170 160 220 160 280H40C40 220 90 170 96 150Z"/></clipPath></defs>
+  <g clip-path="url(#cl)"><rect id="top" class="sand" x="30" y="20" width="140" height="130" fill="var(--sand)"/><rect id="bot" class="sand" x="30" y="280" width="140" height="0" fill="var(--sand)"/><rect id="str" x="99" y="150" width="2" height="130" fill="var(--sand)" opacity="0"/></g>
+  <g fill="none" stroke="var(--glass)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M40 20H160C160 80 110 130 104 150C110 170 160 220 160 280H40C40 220 90 170 96 150C90 130 40 80 40 20Z"/><path d="M28 14H172M28 286H172"/></g>
+ </svg>
+</section>
+
+<section class="card">
+ <h2>🎧 Deep work sound</h2>
+ <div class="music" id="music"></div>
+ <div class="vol">🔈<input type="range" id="vol" min="0" max="100" value="60">🔊</div>
+</section>
+
+<section class="card">
+ <h2>⏳ Today's focus</h2>
+ <div class="stats"><div class="stat"><b id="tot">0m</b><span>focused today</span></div><div class="stat"><b id="ses">0</b><span>sessions done</span></div><div class="stat"><b>4h</b><span>daily goal</span></div></div>
+ <div class="bar"><div id="fill"></div></div>
+ <div id="mini"></div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const GOAL=4*3600, DURS=[15,30,45,60];
+let dur=30*60, left=dur, timer=null, endAt=0, music='off', today={d:'',secs:0,n:0};
+const msgs=["You've got this ✨","Small steps, big wins 🌱","Breathe in, focus on.","Progress over perfection 💛","Future you says thanks 🌅","Look at you, shining ☀️"];
+const key=()=>new Date().toDateString();
+function load(){try{const s=JSON.parse(localStorage.getItem('sunrise-focus'));if(s&&s.d===key())today=s}catch(e){}if(today.d!==key())today={d:key(),secs:0,n:0}}
+function save(){try{localStorage.setItem('sunrise-focus',JSON.stringify(today))}catch(e){}}
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function draw(){
+ $('time').textContent=fmt(left);document.title=(timer?fmt(left)+' · ':'')+'Sunrise Focus';
+ const r=left/dur;
+ $('top').setAttribute('y',150-130*r);$('top').setAttribute('height',130*r);
+ $('bot').setAttribute('y',280-125*(1-r));$('bot').setAttribute('height',125*(1-r));
+ $('str').setAttribute('opacity',timer&&left>0?.9:0);
+ const m=Math.floor(today.secs/60);$('tot').textContent=m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'m';
+ $('ses').textContent=today.n;$('fill').style.width=Math.min(100,today.secs/GOAL*100)+'%';
+ $('mini').innerHTML=Array.from({length:today.n},()=>'<svg viewBox="0 0 24 34"><path d="M4 3H20L13 15V19L20 31H4L11 19V15Z" fill="var(--sand)" stroke="var(--glass)" stroke-width="2" stroke-linejoin="round"/></svg>').join('')||'<span style="color:var(--soft)">Your first hourglass is waiting to be filled ✨</span>';
+}
+function tick(){
+ const l=Math.max(0,Math.round((endAt-Date.now())/1000));
+ if(l<left){today.secs+=left-l;if(l%10===0)save()}
+ left=l;
+ if(left<=0){finish()}draw();
+}
+function finish(){clearInterval(timer);timer=null;today.n++;save();left=dur;$('start').textContent='Start';chime();$('msg').textContent='🎉 Session complete! Stretch, sip some water.';setBtn()}
+function setBtn(){$('start').textContent=timer?'Pause':(left<dur?'Resume':'Start')}
+$('start').onclick=()=>{
+ ctx();
+ if(timer){clearInterval(timer);timer=null;save()}
+ else{endAt=Date.now()+left*1000;timer=setInterval(tick,250);$('msg').textContent=msgs[Math.floor(Math.random()*msgs.length)]}
+ setBtn();draw();
+};
+$('reset').onclick=()=>{clearInterval(timer);timer=null;left=dur;setBtn();draw()};
+$('durs').innerHTML=DURS.map(m=>`<button class="chip${m===30?' on':''}" data-m="${m}">${m} min</button>`).join('');
+$('durs').onclick=e=>{const m=e.target.dataset.m;if(!m||timer)return;dur=left=m*60;[...$('durs').children].forEach(c=>c.classList.toggle('on',c.dataset.m===m));setBtn();draw()};
+
+/* ---------- Audio (all generated live, no files) ---------- */
+let AC,master,stopNodes=[];
+function ctx(){if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=$('vol').value/100*.8;master.connect(AC.destination)}if(AC.state==='suspended')AC.resume()}
+$('vol').oninput=()=>{if(master)master.gain.value=$('vol').value/100*.8};
+function noise(type){const n=AC.sampleRate*4,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);let l=0;
+ for(let i=0;i<n;i++){const w=Math.random()*2-1;if(type==='brown'){l=(l+.02*w)/1.02;d[i]=l*3.5}else d[i]=w}
+ const s=AC.createBufferSource();s.buffer=b;s.loop=true;s.start();return s}
+const N=m=>440*Math.pow(2,(m-69)/12);
+function chords(list,vol,wave,filt){
+ const g=AC.createGain();g.gain.value=vol;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=filt;g.connect(f);f.connect(master);
+ const oscs=[0,1,2,3].map(()=>{const o=AC.createOscillator();o.type=wave;const og=AC.createGain();og.gain.value=.25;o.connect(og);og.connect(g);o.start();return o});
+ let i=0;const step=()=>{list[i%list.length].forEach((n,k)=>oscs[k].frequency.setTargetAtTime(N(n),AC.currentTime,2.5));i++};
+ step();const iv=setInterval(step,8000);
+ stopNodes.push(()=>{clearInterval(iv);oscs.forEach(o=>o.stop());g.disconnect()});
+ return list}
+const CH=[[48,55,64,71],[45,55,64,72],[41,57,64,72],[43,55,62,69]];
+const SOUNDS={
+ off:{n:'Silence',i:'🤫'},
+ pad:{n:'Warm Pad',i:'🌅',f(){chords(CH,.5,'sine',900)}},
+ lofi:{n:'Lo-fi Keys',i:'☕',f(){chords(CH,.25,'triangle',500);
+  const P=[60,62,64,67,69,72,74],g=AC.createGain();g.gain.value=.35;g.connect(master);
+  const iv=setInterval(()=>{if(Math.random()<.35)return;const o=AC.createOscillator(),e=AC.createGain();o.type='triangle';o.frequency.value=N(P[Math.floor(Math.random()*P.length)]);
+   e.gain.setValueAtTime(0,AC.currentTime);e.gain.linearRampToValueAtTime(.4,AC.currentTime+.02);e.gain.exponentialRampToValueAtTime(.001,AC.currentTime+1.8);o.connect(e);e.connect(g);o.start();o.stop(AC.currentTime+2)},1300);
+  stopNodes.push(()=>{clearInterval(iv);g.disconnect()})}},
+ rain:{n:'Soft Rain',i:'🌧️',f(){const s=noise('white'),h=AC.createBiquadFilter(),l=AC.createBiquadFilter(),g=AC.createGain();h.type='highpass';h.frequency.value=800;l.type='lowpass';l.frequency.value=7000;g.gain.value=.35;s.connect(h);h.connect(l);l.connect(g);g.connect(master);stopNodes.push(()=>{s.stop();g.disconnect()})}},
+ ocean:{n:'Ocean Waves',i:'🌊',f(){const s=noise('brown'),l=AC.createBiquadFilter(),g=AC.createGain(),lfo=AC.createOscillator(),lg=AC.createGain();l.type='lowpass';l.frequency.value=700;g.gain.value=.5;lfo.frequency.value=.11;lg.gain.value=.35;lfo.connect(lg);lg.connect(g.gain);lfo.start();s.connect(l);l.connect(g);g.connect(master);stopNodes.push(()=>{s.stop();lfo.stop();g.disconnect()})}},
+ brown:{n:'Brown Noise',i:'🧠',f(){const s=noise('brown'),g=AC.createGain();g.gain.value=.7;s.connect(g);g.connect(master);stopNodes.push(()=>{s.stop();g.disconnect()})}}
+};
+function play(k){stopNodes.forEach(f=>f());stopNodes=[];music=k;if(k!=='off'){ctx();SOUNDS[k].f()}
+ [...$('music').children].forEach(c=>c.classList.toggle('on',c.dataset.k===k))}
+$('music').innerHTML=Object.entries(SOUNDS).map(([k,v])=>`<button class="m${k==='off'?' on':''}" data-k="${k}"><b>${v.i}</b>${v.n}</button>`).join('');
+$('music').onclick=e=>{const b=e.target.closest('.m');if(b)play(b.dataset.k)};
+function chime(){try{ctx();[72,76,79,84].forEach((n,i)=>{const o=AC.createOscillator(),e=AC.createGain(),t=AC.currentTime+i*.25;o.type='sine';o.frequency.value=N(n);e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(.4,t+.02);e.gain.exponentialRampToValueAtTime(.001,t+2);o.connect(e);e.connect(master);o.start(t);o.stop(t+2.1)})}catch(e){}}
+load();draw();
+</script></body></html>
